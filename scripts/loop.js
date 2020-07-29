@@ -51,14 +51,13 @@ window.requestAnimationFrame(loop);
 
 var flock = new Flock();
 //Add some boids
-for (var i = 0; i < 1; i++) {
+for (var i = 0; i < 100; i++) {
   var min = 100;
   var scale = 100;
   var accelerationScale = 10;
   var position = new Vector2();
   position.x = Math.random() * width;
   position.y = Math.random() * height;
-  var velocity = new Vector2();
   // velocity.x = (Math.random() * 2 - 1) * scale;
   // if (velocity.x < 0)
   //   velocity.x -= min;
@@ -70,6 +69,8 @@ for (var i = 0; i < 1; i++) {
   // else
   //   velocity.y += min;
   var acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
-  var boid = new Boid(BoidTypes.Red, position, velocity, acceleration);
+  var velocity = acceleration.normalize().mult(15);
+  var boidType = Math.round(Math.random()) ? BoidTypes.Red : BoidTypes.Cyan;
+  var boid = new Boid(boidType, position, velocity, acceleration, acceleration.normalize().setMagnitude(30), 30, 15);
   flock.addBoid(boid);
 }

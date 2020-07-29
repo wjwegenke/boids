@@ -4,12 +4,18 @@ class Vector2 {
         this.y = y || 0;
     }
 
+    copy = () => {
+        return new Vector2(this.x, this.y);
+    }
+
     magnitude = () => {
         return Math.sqrt(this.x*this.x + this.y*this.y);
     }
 
     normalize = () => {
         var mag = this.magnitude();
+        if (mag === 0)
+            return new Vector2(1,0);
         return new Vector2(this.x / mag, this.y / mag);
     }
 
@@ -32,6 +38,44 @@ class Vector2 {
             this.mult(scale);
         }
         return this;
+    }
+
+    limitMagnitudeMin = (minMagnitude) => {
+        var mag = this.magnitude();
+        if (mag < minMagnitude) {
+            var scale = minMagnitude / mag;
+            this.mult(scale);
+        }
+        return this;
+    }
+
+    setMagnitude = (magnitude) => {
+        var scale = magnitude / this.magnitude();
+        this.mult(scale);
+        return this;
+    }
+
+    equals = (vector2) => {
+        return this.x === vector2.x && this.y === vector2.y;
+    }
+
+    isClose = (vector2, threshold) => {
+        return this.isDirectionClose(vector2, threshold) && this.isMagnitudeClose(vector2, threshold);
+    }
+
+    isDirectionClose = (vector2, threshold) => {
+        threshold = threshold || 0.1;
+        var thisNormal = this.normalize();
+        var thatNormal = vector2.normalize();
+        return (thisNormal.x < thatNormal.x + threshold && thisNormal.x > thatNormal.x - threshold
+            && thisNormal.y < thatNormal.y + threshold && thisNormal.y > thatNormal.y - threshold);
+    }
+
+    isMagnitudeClose = (vector2, threshold) => {
+        threshold = threshold || 0.1;
+        var thisMag = this.magnitude();
+        var thatMag = vector2.magnitude();
+        return (thisMag < thatMag + threshold && thisMag > thatMag - threshold);
     }
 }
 
