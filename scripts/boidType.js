@@ -1,17 +1,38 @@
 var BoidTypes = {
-    Blue: {
+    Pink: {
         id: 1,
-        color: 'blue',
-        maxAcceleration: 20
+        color: 'pink',
+        size: 8,
+        baseAcceleration: 15,
+        maxAcceleration: 20,
+        proximityRadius: 150,
+        directRadius: 120,
+        repelRadius: 150,
+        attractRadius: 120,
+        proximityAngle: 2 * Math.PI / 3,
     },
     Red: {
-        id: 1,
+        id: 2,
         color: 'red',
-        maxAcceleration: 20
+        size: 8,
+        baseAcceleration: 15,
+        maxAcceleration: 20,
+        proximityRadius: 150,
+        directRadius: 100,
+        repelRadius: 60,
+        attractRadius: 150,
+        proximityAngle: 2 * Math.PI / 3,
     },
     Cyan: {
-        id: 1,
+        id: 3,
         color: 'cyan',
-        maxAcceleration: 20
+        size: 8,
+        baseAcceleration: 15,
+        maxAcceleration: 20,
+        proximityRadius: 150,
+        directRadius: 150,
+        repelRadius: 150,
+        attractRadius: 150,
+        proximityAngle: 2 * Math.PI / 3,
     }
 }

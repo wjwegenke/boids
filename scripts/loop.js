@@ -2,6 +2,13 @@ var canvas = document.getElementById("canvas")
 var ctx = canvas.getContext("2d")
 var width
 var height
+var pixelsPerMeter = 5;
+var drawAcceleration = false;
+var drawVelocity = false;
+var drawProximity = false;
+var direct = true;
+var attract = true;
+var repel = true;
 
 var resize = function() {
   width = window.innerWidth * 2
@@ -12,33 +19,10 @@ var resize = function() {
 window.onresize = resize;
 resize();
 
-function update(progress) {
-  state.x += progress
-  if (state.x > width) {
-    state.x -= width;
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, width, height);
-
-  //ctx.fillRect(state.x - 10, state.y - 10, 20, 20)
-  ctx.beginPath();
-  ctx.fillStyle = 'green';
-  ctx.arc(state.x, state.y, 10, 0, 2*Math.PI, true);
-  ctx.fill();
-  ctx.closePath();
-  ctx.beginPath();
-  ctx.fillStyle = 'red';
-  ctx.arc(state.x, state.y + 20, 10, 0, 2*Math.PI, true);
-  ctx.fill();
-  ctx.closePath();
-}
-
 function loop(timestamp) {
   var deltaTime = (timestamp - lastRender);
 
-  flock.update(deltaTime);
+  flock.update(deltaTime, ctx);
   flock.lateUpdate(deltaTime, ctx);
   ctx.clearRect(0, 0, width, height)
   flock.draw(ctx);
@@ -58,19 +42,11 @@ for (var i = 0; i < 100; i++) {
   var position = new Vector2();
   position.x = Math.random() * width;
   position.y = Math.random() * height;
-  // velocity.x = (Math.random() * 2 - 1) * scale;
-  // if (velocity.x < 0)
-  //   velocity.x -= min;
-  // else
-  //   velocity.x += min;
-  // velocity.y = (Math.random() * 2 - 1) * scale;
-  // if (velocity.y < 0)
-  //   velocity.y -= min;
-  // else
-  //   velocity.y += min;
   var acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
   var velocity = acceleration.normalize().mult(15);
-  var boidType = Math.round(Math.random()) ? BoidTypes.Red : BoidTypes.Cyan;
-  var boid = new Boid(boidType, position, velocity, acceleration, acceleration.normalize().setMagnitude(30), 30, 15);
+  var boidTypes = [BoidTypes.Red, BoidTypes.Pink, BoidTypes.Cyan];
+  var boidType = boidTypes[Math.round(Math.random() * 3)];
+  //var boidType = Math.round(Math.random()) ? BoidTypes.Red : BoidTypes.Cyan;
+  var boid = new Boid(boidType, position, velocity, acceleration);
   flock.addBoid(boid);
 }

@@ -12,9 +12,9 @@ class Flock {
         this.flock.push(boid);
     }
 
-    update = (deltaTime) => {
+    update = (deltaTime, ctx) => {
         for(let i = 0; i < this.flock.length; i++) {
-            this.flock[i].update(deltaTime, this.flock);
+            this.flock[i].update(deltaTime, this.flock, ctx);
         }    
     }
 
