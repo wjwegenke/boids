@@ -1,14 +1,14 @@
-function calculateDragMagnitude(speed) {
+function calculateDragMagnitude(squareSpeed) {
     var force = new Vector2();
     var k = 0.1; //0.0028125
-    var dragMagnitude = k * speed * speed
+    var dragMagnitude = k * squareSpeed
     return dragMagnitude;
 }
 
 function calculateDragForce(velocity) {
     var force = new Vector2();
-    var speed = velocity.magnitude();
-    var dragMagnitude = calculateDragMagnitude(speed);
+    var squareSpeed = velocity.squareMagnitude;
+    var dragMagnitude = calculateDragMagnitude(squareSpeed);
     force.x = velocity.x;
     force.y = velocity.y;
     force = force.normalize();

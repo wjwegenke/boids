@@ -29,4 +29,10 @@ class Flock {
             this.flock[i].draw(ctx);
         }    
     }
+
+    lateDraw = (ctx) => {
+        for(let i = 0; i < this.flock.length; i++) {
+            this.flock[i].lateDraw(ctx);
+        }    
+    }
 }

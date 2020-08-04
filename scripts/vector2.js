@@ -4,16 +4,28 @@ class Vector2 {
         this.y = y || 0;
     }
 
+    get magnitude() {
+        return Math.sqrt(this.squareMagnitude);
+    }
+
+    get squareMagnitude() {
+        return this.x*this.x + this.y*this.y;
+    }
+
+    getDistance = (vector2) => {
+        return Math.sqrt(this.getSquareDistance(vector2));
+    }
+
+    getSquareDistance = (vector2) => {
+        return Math.pow(this.x - vector2.x, 2) + Math.pow(this.y - vector2.y, 2);
+    }
+
     copy = () => {
         return new Vector2(this.x, this.y);
     }
 
-    magnitude = () => {
-        return Math.sqrt(this.x*this.x + this.y*this.y);
-    }
-
     normalize = () => {
-        var mag = this.magnitude();
+        var mag = this.magnitude;
         if (mag === 0)
             return new Vector2(1,0);
         return new Vector2(this.x / mag, this.y / mag);
@@ -32,25 +44,25 @@ class Vector2 {
     }
 
     limitMagnitude = (maxMagnitude) => {
-        var mag = this.magnitude();
-        if (mag > maxMagnitude) {
-            var scale = maxMagnitude / mag;
+        var squareMag = this.squareMagnitude;
+        if (squareMag > maxMagnitude * maxMagnitude) {
+            var scale = maxMagnitude / this.magnitude;
             this.mult(scale);
         }
         return this;
     }
 
     limitMagnitudeMin = (minMagnitude) => {
-        var mag = this.magnitude();
-        if (mag < minMagnitude) {
-            var scale = minMagnitude / mag;
+        var squareMag = this.squareMagnitude;
+        if (squareMag < minMagnitude * minMagnitude) {
+            var scale = minMagnitude / this.magnitude;
             this.mult(scale);
         }
         return this;
     }
 
     setMagnitude = (magnitude) => {
-        var scale = magnitude / this.magnitude();
+        var scale = magnitude / this.magnitude;
         this.mult(scale);
         return this;
     }
@@ -73,12 +85,8 @@ class Vector2 {
 
     isMagnitudeClose = (vector2, threshold) => {
         threshold = threshold || 0.1;
-        var thisMag = this.magnitude();
-        var thatMag = vector2.magnitude();
+        var thisMag = this.magnitude;
+        var thatMag = vector2.magnitude;
         return (thisMag < thatMag + threshold && thisMag > thatMag - threshold);
     }
-}
-
-Vector2.prototype ["+"] = function (operand) {
-    return new Vector2(this.x + operand.x, this.y + operand.y);
 }

@@ -6,6 +6,9 @@ var pixelsPerMeter = 5;
 var drawAcceleration = false;
 var drawVelocity = false;
 var drawProximity = false;
+var drawAttraction = true;
+var drawRepel = true;
+var drawDirection = true;
 var direct = true;
 var attract = true;
 var repel = true;
@@ -26,6 +29,7 @@ function loop(timestamp) {
   flock.lateUpdate(deltaTime, ctx);
   ctx.clearRect(0, 0, width, height)
   flock.draw(ctx);
+  flock.lateDraw(ctx);
   
   lastRender = timestamp;
   window.requestAnimationFrame(loop);
