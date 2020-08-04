@@ -13,7 +13,7 @@ var BoidTypes = {
     Red: {
         id: 2,
         color: 'red',
-        size: 8,
+        size: 4,
         baseAcceleration: 15,
         maxAcceleration: 20,
         directRadius: 100,
@@ -24,7 +24,7 @@ var BoidTypes = {
     Cyan: {
         id: 3,
         color: 'cyan',
-        size: 8,
+        size: 6,
         baseAcceleration: 18,
         maxAcceleration: 22,
         directRadius: 75,
