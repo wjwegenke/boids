@@ -27,7 +27,7 @@ var BoidTypes = {
         size: 6,
         baseAcceleration: 18,
         maxAcceleration: 22,
-        directRadius: 75,
+        directRadius: 125,
         repelRadius: 50,
         attractRadius: 150,
         proximityAngle: 2 * Math.PI / 3,
