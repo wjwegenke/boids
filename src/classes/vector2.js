@@ -90,3 +90,5 @@ class Vector2 {
         return (thisMag < thatMag + threshold && thisMag > thatMag - threshold);
     }
 }
+
+export default Vector2;

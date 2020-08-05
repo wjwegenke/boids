@@ -1,3 +1,6 @@
+import Vector2 from './vector2';
+import * as physics from './physics';
+
 class Boid {
     constructor(position, velocity, acceleration) {
         this.position = position || new Vector2(20, 20);
@@ -6,38 +9,32 @@ class Boid {
         this.prevVelocity = new Vector2();
     }
 
-    update = (deltaTime, ctx) => {
+    update = (deltaTime, ctx, flocks) => {
         //Calculate acceleration
         var acceleration = new Vector2();
-        var dragForce = calculateDragForce(this.velocity);
+        var dragForce = physics.calculateDragForce(this.velocity);
 
-        var allProximityBoids = this.getAllProximityBoids(flocks, Math.max(this.flock.directRadius, this.flock.attractRadius, this.flock.repelRadius));
+        //var allProximityBoids = this.getAllProximityBoids(flocks, Math.max(this.flock.directRadius, this.flock.attractRadius, this.flock.repelRadius), ctx);
 
-        var directStartTime = Date.now();
-        if (direct) {
-            this.directBoids = this.getProximityBoids(allProximityBoids, this.flock.directRadius);
+        if (this.flock.direct) {
+            this.directBoids = this.getFlockMates(this.flock.directRadius, ctx);
             var directionForce = this.calculateDirectionForce(deltaTime, this.directBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(directionForce);
         } else {
             acceleration = this.calculateDirectionForce(deltaTime, [], ctx.canvas.width, ctx.canvas.height);
         }
-        directTime += Date.now() - directStartTime;
 
-        var attractStartTime = Date.now();
-        if (attract) {
-            this.attractBoids = this.getProximityBoids(allProximityBoids, this.flock.attractRadius);
+        if (this.flock.attract) {
+            this.attractBoids = this.getFlockMates(this.flock.attractRadius, ctx);
             var attractionForce = this.calculateAttractionForce(deltaTime, this.attractBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(attractionForce);
         }
-        attractTime += Date.now() - attractStartTime;
 
-        var repelStartTime = Date.now();
-        if (repel) {
-            this.repelBoids = this.getAllProximityBoids(flocks, this.flock.repelRadius);
+        if (this.flock.repel) {
+            this.repelBoids = this.getAllProximityBoids(flocks, this.flock.repelRadius, ctx);
             var repelForce = this.calculateRepelForce(deltaTime, this.repelBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(repelForce);
         }
-        repelTime += Date.now() - repelStartTime;
 
         acceleration.limitMagnitude(this.flock.maxAcceleration);
 
@@ -52,9 +49,9 @@ class Boid {
     }
 
     draw = (ctx) => {
-        if (drawOnAll || this === this.flock.boids[0]) {
+        if (this.flock.drawOnAll || this === this.flock.boids[0]) {
             ctx.lineWidth = 1;
-            if (drawDirectRadius) {
+            if (this.flock.drawDirectRadius) {
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(0,0,255,0.7)";
@@ -88,7 +85,7 @@ class Boid {
                 });
             }
 
-            if (drawAttractRadius) {
+            if (this.flock.drawAttractRadius) {
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(0,255,0,0.7)";
@@ -122,7 +119,7 @@ class Boid {
                 });
             }
 
-            if (drawRepelRadius) {
+            if (this.flock.drawRepelRadius) {
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(255,0,0,0.7)";
@@ -157,34 +154,34 @@ class Boid {
             }
 
             //Draw Acceleration Line
-            if (drawAcceleration) {
+            if (this.flock.drawAcceleration) {
                 ctx.beginPath();
                 ctx.strokeStyle = "#FFFFFF";
                 ctx.lineWidth = 5;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(this.position.x + this.acceleration.x * pixelsPerMeter, this.position.y + this.acceleration.y * pixelsPerMeter);
+                ctx.lineTo(this.position.x + this.acceleration.x * physics.pixelsPerMeter, this.position.y + this.acceleration.y * physics.pixelsPerMeter);
                 ctx.stroke();
                 ctx.closePath();
             }
 
             //Draw Velocity Line
-            if (drawVelocity) {
+            if (this.flock.drawVelocity) {
                 ctx.beginPath();
                 ctx.strokeStyle = "#88FF88";
                 ctx.lineWidth = 2;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(this.position.x + this.velocity.x * pixelsPerMeter, this.position.y + this.velocity.y * pixelsPerMeter);
+                ctx.lineTo(this.position.x + this.velocity.x * physics.pixelsPerMeter, this.position.y + this.velocity.y * physics.pixelsPerMeter);
                 ctx.stroke();
                 ctx.closePath();
             }
 
-            if (drawAttraction)
+            if (this.flock.drawAttraction)
                 this.drawAttraction(ctx);
 
-            if (drawRepel)
+            if (this.flock.drawRepel)
                 this.drawRepel(ctx);
 
-            if (drawDirection)
+            if (this.flock.drawDirection)
                 this.drawDirection(ctx);
         }
     }
@@ -522,19 +519,19 @@ class Boid {
         }
     }
 
-    getProximityBoids = (flock, radius) => {
+    getFlockMates = (radius, ctx) => {
         var proximityBoids = [];
         var myAngle = Math.atan2(this.velocity.y, this.velocity.x) + Math.PI; //0 to 2PI
 
-        flock.forEach(boid => {
+        this.flock.boids.forEach(boid => {
             //Need to figure out edges.
-            if (boid.flock !== this.flock || boid === this)
+            if (boid === this)
                 return;
 
             var xDiff = Infinity;
             var xDiff1 = boid.position.x - this.position.x;
-            var xDiff2 = boid.position.x - this.position.x - width;
-            var xDiff3 = boid.position.x - this.position.x + width;
+            var xDiff2 = boid.position.x - this.position.x - ctx.canvas.width;
+            var xDiff3 = boid.position.x - this.position.x + ctx.canvas.width;
             var xDiffMin = Math.min(Math.abs(xDiff1), Math.abs(xDiff2), Math.abs(xDiff3));
             if (xDiffMin === Math.abs(xDiff3)) {
                 xDiff = xDiff3;
@@ -546,8 +543,8 @@ class Boid {
 
             var yDiff = Infinity;
             var yDiff1 = boid.position.y - this.position.y;
-            var yDiff2 = boid.position.y - this.position.y - height;
-            var yDiff3 = boid.position.y - this.position.y + height;
+            var yDiff2 = boid.position.y - this.position.y - ctx.canvas.height;
+            var yDiff3 = boid.position.y - this.position.y + ctx.canvas.height;
             var yDiffMin = Math.min(Math.abs(yDiff1), Math.abs(yDiff2), Math.abs(yDiff3));
             if (yDiffMin === Math.abs(yDiff3)) {
                 yDiff = yDiff3;
@@ -570,7 +567,7 @@ class Boid {
         return proximityBoids;
     }
 
-    getAllProximityBoids = (flocks, radius) => {
+    getAllProximityBoids = (flocks, radius, ctx) => {
         var proximityBoids = [];
         var myAngle = Math.atan2(this.velocity.y, this.velocity.x) + Math.PI; //0 to 2PI
 
@@ -582,8 +579,8 @@ class Boid {
 
                 var xDiff = Infinity;
                 var xDiff1 = boid.position.x - this.position.x;
-                var xDiff2 = boid.position.x - this.position.x - width;
-                var xDiff3 = boid.position.x - this.position.x + width;
+                var xDiff2 = boid.position.x - this.position.x - ctx.canvas.width;
+                var xDiff3 = boid.position.x - this.position.x + ctx.canvas.width;
                 var xDiffMin = Math.min(Math.abs(xDiff1), Math.abs(xDiff2), Math.abs(xDiff3));
                 if (xDiffMin === Math.abs(xDiff3)) {
                     xDiff = xDiff3;
@@ -595,8 +592,8 @@ class Boid {
 
                 var yDiff = Infinity;
                 var yDiff1 = boid.position.y - this.position.y;
-                var yDiff2 = boid.position.y - this.position.y - height;
-                var yDiff3 = boid.position.y - this.position.y + height;
+                var yDiff2 = boid.position.y - this.position.y - ctx.canvas.height;
+                var yDiff3 = boid.position.y - this.position.y + ctx.canvas.height;
                 var yDiffMin = Math.min(Math.abs(yDiff1), Math.abs(yDiff2), Math.abs(yDiff3));
                 if (yDiffMin === Math.abs(yDiff3)) {
                     yDiff = yDiff3;
@@ -740,8 +737,8 @@ class Boid {
 
     calculatePosition(deltaTime, width, height) {
         var displacement = new Vector2();
-        displacement.x = (this.velocity.x + this.prevVelocity.x) * deltaTime / 2000 * pixelsPerMeter;
-        displacement.y = (this.velocity.y + this.prevVelocity.y) * deltaTime / 2000 * pixelsPerMeter;
+        displacement.x = (this.velocity.x + this.prevVelocity.x) * deltaTime / 2000 * physics.pixelsPerMeter;
+        displacement.y = (this.velocity.y + this.prevVelocity.y) * deltaTime / 2000 * physics.pixelsPerMeter;
         displacement.mult(2);
         this.position = this.position.combine(displacement);
         if (this.position.x < 0 || this.position.x > width)
@@ -767,19 +764,4 @@ class Boid {
     }
 }
 
-function getCompliment(boid, ctx, radius) {
-    var complimentX = boid.position.x;
-    var complimentY = boid.position.y;
-    radius = radius || boid.flock.size;
-    if (boid.position.y < radius) {
-        complimentY = ctx.canvas.height + boid.position.y;
-    } else if (boid.position.y > ctx.canvas.height - radius) {
-        complimentY = boid.position.y - ctx.canvas.height;
-    }
-    if (boid.position.x < radius) {
-        complimentX = ctx.canvas.width + boid.position.x;
-    } else if (boid.position.x > ctx.canvas.width - radius) {
-        complimentX = boid.position.x - ctx.canvas.width;
-    }
-    return new Vector2(complimentX, complimentY);
-}
+export default Boid;
