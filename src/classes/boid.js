@@ -732,7 +732,8 @@ class Boid {
 
     calculateVelocity(deltaTime) {
         this.velocity = this.prevVelocity.copy().combine(this.acceleration.copy().mult(deltaTime / 1000));
-        this.velocity.limitMagnitude(100);
+        this.velocity.limitMagnitude(physics.maxSpeed);
+        this.velocity.limitMagnitudeMin(this.flock.minSpeed);
     }
 
     calculatePosition(deltaTime, width, height) {

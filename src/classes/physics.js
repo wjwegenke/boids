@@ -1,6 +1,7 @@
 import Vector2 from './vector2';
 
 export const pixelsPerMeter = 5;
+export const maxSpeed = 100;
 
 export function calculateDragMagnitude(squareSpeed) {
     var k = 0.1; //0.0028125

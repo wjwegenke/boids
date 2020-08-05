@@ -7,9 +7,10 @@ class Flock {
         this.size = 4;
         this.baseAcceleration = 15;
         this.maxAcceleration = 20;
+        this.minSpeed = 5;
         this.directRadius = 100;
-        this.repelRadius = 140;
-        this.attractRadius = 150;
+        this.repelRadius = 50;
+        this.attractRadius = 50;
         this.proximityAngle = 2 * Math.PI / 3;
 
         this.direct = true;

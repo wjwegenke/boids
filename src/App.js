@@ -27,7 +27,7 @@ function App() {
         let thisCtx = canvasEl.current.getContext('2d');
         
         const flock = new Flock();
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 200; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
             position.x = Math.random() * canvasEl.current.width;
@@ -39,7 +39,8 @@ function App() {
         }
         
         const flock2 = new Flock();
-        for (let i = 0; i < 50; i++) {
+        for (let i = 0; i < 200; i++) {
+            flock2.color = 'grey';
             const accelerationScale = 10;
             const position = new Vector2();
             position.x = Math.random() * canvasEl.current.width;
