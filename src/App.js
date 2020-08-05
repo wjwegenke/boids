@@ -14,6 +14,8 @@ function App() {
         width: window.innerWidth
     });
     const [ctx, setCtx] = useState(null);
+    const [fps, setFps] = useState(0);
+    const [dTime, setDTime] = useState(0);
     useEffect(() => {
         function handleResize() {
             setDimensions({
@@ -27,7 +29,7 @@ function App() {
         let thisCtx = canvasEl.current.getContext('2d');
         
         const flock = new Flock();
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 150; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
             position.x = Math.random() * canvasEl.current.width;
@@ -39,7 +41,7 @@ function App() {
         }
         
         const flock2 = new Flock();
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 150; i++) {
             flock2.color = 'grey';
             const accelerationScale = 10;
             const position = new Vector2();
@@ -56,6 +58,8 @@ function App() {
     }, []);
 
     useAnimationFrame(deltaTime => {
+        setDTime(Math.round(deltaTime));
+        setFps(Math.round(1000 / deltaTime));
         flocks.forEach(flock => flock.update(deltaTime, ctx, flocks));
         flocks.forEach(flock => flock.lateUpdate(deltaTime, ctx));
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
@@ -69,6 +73,15 @@ function App() {
             {flocks.map(flock => {
                 return (<DrawAll flock={flock}/>)
             })}
+            <div id="stats">
+                <span>FPS:</span><span id="statFPS">{fps}</span><br/>
+                <span>Delta Time:</span><span id="statDeltaTime">{dTime}</span><br/>
+                <span>Direction Time:</span><span id="statDirectionTime"></span><br/>
+                <span>Attraction Time:</span><span id="statAttracitonTime"></span><br/>
+                <span>Repel Time:</span><span id="statRepelTime"></span><br/>
+                <span>Update Time:</span><span id="statUpdateTime"></span><br/>
+                <span>Draw Time:</span><span id="statDrawTime"></span>
+            </div>
         </div>
     );
 }
