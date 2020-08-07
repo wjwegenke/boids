@@ -1,14 +1,14 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import useAnimationFrame from './useAnimationFrame';
-import Flock from './classes/flock';
+import Bunch from './classes/bunch';
 import Boid from './classes/boid';
 import Vector2 from './classes/vector2';
 import DrawAll from './components/drawAll';
 
 function App() {
     const canvasEl = useRef(null);
-    const [flocks, setFlocks] = useState([]);
+    const [bunches, setBunches] = useState([]);
     const [dimensions, setDimensions] = useState({
         height: window.innerHeight,
         width: window.innerWidth
@@ -28,7 +28,7 @@ function App() {
         window.addEventListener('resize', handleResize);
         let thisCtx = canvasEl.current.getContext('2d');
         
-        const flock = new Flock();
+        const bunch = new Bunch();
         for (let i = 0; i < 150; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
@@ -37,10 +37,10 @@ function App() {
             const acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
             const velocity = acceleration.normalize().mult(15);
             let boid = new Boid(position, velocity, acceleration);
-            flock.addBoid(boid);
+            bunch.addBoid(boid);
         }
         
-        const flock2 = new Flock();
+        const flock2 = new Bunch();
         for (let i = 0; i < 150; i++) {
             flock2.color = 'grey';
             const accelerationScale = 10;
@@ -53,25 +53,25 @@ function App() {
             flock2.addBoid(boid);
         }
 
-        setFlocks([flock, flock2]);
+        setBunches([bunch, flock2]);
         setCtx(thisCtx);
     }, []);
 
     useAnimationFrame(deltaTime => {
         setDTime(Math.round(deltaTime));
         setFps(Math.round(1000 / deltaTime));
-        flocks.forEach(flock => flock.update(deltaTime, ctx, flocks));
-        flocks.forEach(flock => flock.lateUpdate(deltaTime, ctx));
+        bunches.forEach(bunch => bunch.update(deltaTime, ctx, bunches));
+        bunches.forEach(bunch => bunch.lateUpdate(deltaTime, ctx));
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-        flocks.forEach(flock => flock.draw(ctx));
-        flocks.forEach(flock => flock.lateDraw(ctx));
+        bunches.forEach(bunch => bunch.draw(ctx));
+        bunches.forEach(bunch => bunch.lateDraw(ctx));
     });
 
     return (
         <div className="App">
             <canvas id="canvas" ref={canvasEl} width={dimensions.width} height={dimensions.height}></canvas>
-            {flocks.map(flock => {
-                return (<DrawAll flock={flock}/>)
+            {bunches.map(bunch => {
+                return (<DrawAll bunch={bunch}/>)
             })}
             <div id="stats">
                 <span>FPS:</span><span id="statFPS">{fps}</span><br/>

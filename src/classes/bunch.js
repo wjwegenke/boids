@@ -1,6 +1,6 @@
 import Boid from './boid';
 
-class Flock {
+class Bunch {
     constructor() {
         this.boids = [];
         this.color = 'red';
@@ -29,19 +29,19 @@ class Flock {
     }
 
     addBoid = (boid) => {
-        boid.flock = this;
+        boid.bunch = this;
         this.boids.push(boid);
     }
 
     addNewBoid = (position, velocity, acceleration) => {
         let boid = new Boid(position, velocity, acceleration);
-        boid.flock = this;
+        boid.bunch = this;
         this.boids.push(boid);
     }
 
-    update = (deltaTime, ctx, flocks) => {
+    update = (deltaTime, ctx, bunches) => {
         for(let i = 0; i < this.boids.length; i++) {
-            this.boids[i].update(deltaTime, ctx, flocks);
+            this.boids[i].update(deltaTime, ctx, bunches);
         }    
     }
 
@@ -64,4 +64,4 @@ class Flock {
     }
 }
 
-export default Flock;
+export default Bunch;

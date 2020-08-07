@@ -43,14 +43,14 @@ function loop(timestamp) {
     drawTime = 0;
 
     var updateStartTime = Date.now();
-    flocks.forEach(flock => flock.update(deltaTime, ctx));
-    flocks.forEach(flock => flock.lateUpdate(deltaTime, ctx));
+    bunches.forEach(bunch => bunch.update(deltaTime, ctx));
+    bunches.forEach(bunch => bunch.lateUpdate(deltaTime, ctx));
     updateTime = Date.now() - updateStartTime;
   
     var drawStartTime = Date.now();
     ctx.clearRect(0, 0, width, height)
-    flocks.forEach(flock => flock.draw(ctx));
-    flocks.forEach(flock => flock.lateDraw(ctx));
+    bunches.forEach(bunch => bunch.draw(ctx));
+    bunches.forEach(bunch => bunch.lateDraw(ctx));
     drawTime = Date.now() - drawStartTime;
   
     if (showStats) {
@@ -69,7 +69,7 @@ function loop(timestamp) {
 var lastRender = 0
 window.requestAnimationFrame(loop);
 
-var flocks = [new Flock(), new Flock(), new Flock()];
+var bunches = [new Bunch(), new Bunch(), new Bunch()];
 //Add some boids
 for (var i = 0; i < 33; i++) {
     var min = 100;
@@ -84,18 +84,18 @@ for (var i = 0; i < 33; i++) {
     var boidType = boidTypes[Math.round(Math.random() * 3)];
     //var boidType = Math.round(Math.random()) ? BoidTypes.Red : BoidTypes.Cyan;
     var boid = new Boid(position, velocity, acceleration);
-    flocks[0].addBoid(boid);
+    bunches[0].addBoid(boid);
 }
 //Add some boids
 for (var i = 0; i < 33; i++) {
-    flocks[1].color = 'cyan';
-    flocks[1].size = 6;
-    flocks[1].baseAcceleration = 18;
-    flocks[1].maxAcceleration = 22;
-    flocks[1].directRadius = 150;
-    flocks[1].repelRadius = 150;
-    flocks[1].attractRadius = 150;
-    flocks[1].proximityAngle = 2 * Math.PI / 3;
+    bunches[1].color = 'cyan';
+    bunches[1].size = 6;
+    bunches[1].baseAcceleration = 18;
+    bunches[1].maxAcceleration = 22;
+    bunches[1].directRadius = 150;
+    bunches[1].repelRadius = 150;
+    bunches[1].attractRadius = 150;
+    bunches[1].proximityAngle = 2 * Math.PI / 3;
     var min = 100;
     var scale = 100;
     var accelerationScale = 10;
@@ -107,18 +107,18 @@ for (var i = 0; i < 33; i++) {
     var boidTypes = [BoidTypes.Red, BoidTypes.Pink, BoidTypes.Cyan];
     var boidType = boidTypes[Math.round(Math.random() * 3)];
     var boid = new Boid(position, velocity, acceleration);
-    flocks[1].addBoid(boid);
+    bunches[1].addBoid(boid);
 }
 //Add some boids
 for (var i = 0; i < 33; i++) {
-    flocks[2].color = 'pink';
-    flocks[2].size = 8;
-    flocks[2].baseAcceleration = 25;
-    flocks[2].maxAcceleration = 30;
-    flocks[2].directRadius = 250;
-    flocks[2].repelRadius = 150;
-    flocks[2].attractRadius = 200;
-    flocks[2].proximityAngle = 2 * Math.PI / 3;
+    bunches[2].color = 'pink';
+    bunches[2].size = 8;
+    bunches[2].baseAcceleration = 25;
+    bunches[2].maxAcceleration = 30;
+    bunches[2].directRadius = 250;
+    bunches[2].repelRadius = 150;
+    bunches[2].attractRadius = 200;
+    bunches[2].proximityAngle = 2 * Math.PI / 3;
     var min = 100;
     var scale = 100;
     var accelerationScale = 10;
@@ -131,5 +131,5 @@ for (var i = 0; i < 33; i++) {
     var boidType = boidTypes[Math.round(Math.random() * 3)];
     //var boidType = Math.round(Math.random()) ? BoidTypes.Red : BoidTypes.Cyan;
     var boid = new Boid(position, velocity, acceleration);
-    flocks[2].addBoid(boid);
+    bunches[2].addBoid(boid);
 }

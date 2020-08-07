@@ -2,7 +2,7 @@ import React from 'react';
 
 function DrawAll(props) {
     function toggleDrawAll() {
-        props.flock.drawOnAll = !props.flock.drawOnAll;
+        props.bunch.drawOnAll = !props.bunch.drawOnAll;
     }
 
     return (
