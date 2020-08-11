@@ -7,10 +7,15 @@ html, body {
 }
 
 canvas {
-    position: absolute;
-    background: #000;
+  position: absolute;
+  background: #000;
 }
 
-#stats, .App > div {
-    position: relative;
+#stats {
+  position: relative;
 }
+
+.App div {
+  position: relative;
+}
+/*# sourceMappingURL=site.css.map */

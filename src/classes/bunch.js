@@ -1,7 +1,10 @@
 import Boid from './boid';
+import Vector2 from './vector2';
 
 class Bunch {
     constructor() {
+        this.dimensions = { height: 0, width: 0 };
+
         this.boids = [];
         this.color = 'red';
         this.size = 4;
@@ -9,23 +12,44 @@ class Bunch {
         this.maxAcceleration = 20;
         this.minSpeed = 5;
         this.directRadius = 100;
-        this.repelRadius = 50;
-        this.attractRadius = 50;
+        this.attractRadius = 100;
+        this.repelRadius = 100;
         this.proximityAngle = 2 * Math.PI / 3;
+        this.directAngle = 2 * Math.PI / 3;
+        this.attractAngle = 2 * Math.PI / 3;
+        this.repelAngle = 2 * Math.PI / 3;
+        this.directScale = 1;
+        this.attractScale = 1;
+        this.repelLikeScale = 1;
+        this.repelOtherScale = 2;
 
         this.direct = true;
         this.attract = true;
         this.repel = true;
-        this.drawAcceleration = true;
-        this.drawVelocity = true;
-        this.drawProximity = true;
-        this.drawDirectRadius = true;
-        this.drawAttractRadius = true;
-        this.drawRepelRadius = true;
-        this.drawDirection = true;
-        this.drawAttraction = true;
-        this.drawRepel = true;
+        this.drawAcceleration = false;
+        this.drawVelocity = false;
+        this.drawDirectRadius = false;
+        this.drawAttractRadius = false;
+        this.drawRepelRadius = false;
+        this.drawDirection = false;
+        this.drawAttraction = false;
+        this.drawRepel = false;
         this.drawOnAll = false;
+    }
+
+    get count() {
+        return this.boids.length;
+    }
+    set count(value) {
+        while (this.count < value) {
+            let position = new Vector2(Math.random() * this.dimensions.width, Math.random() * this.dimensions.height);
+            let velocity = new Vector2();
+            let acceleration = new Vector2(Math.random(), Math.random());
+            this.addNewBoid(position, velocity, acceleration);
+        }
+        while (this.count > value) {
+            this.boids.pop();
+        }
     }
 
     addBoid = (boid) => {

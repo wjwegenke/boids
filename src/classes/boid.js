@@ -17,7 +17,7 @@ class Boid {
         //var allProximityBoids = this.getAllProximityBoids(bunches, Math.max(this.bunch.directRadius, this.bunch.attractRadius, this.bunch.repelRadius), ctx);
 
         if (this.bunch.direct) {
-            this.directBoids = this.getFlockMates(this.bunch.directRadius, ctx);
+            this.directBoids = this.getBunchMates(this.bunch.directRadius, this.bunch.directAngle, ctx);
             var directionForce = this.calculateDirectionForce(deltaTime, this.directBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(directionForce);
         } else {
@@ -25,13 +25,13 @@ class Boid {
         }
 
         if (this.bunch.attract) {
-            this.attractBoids = this.getFlockMates(this.bunch.attractRadius, ctx);
+            this.attractBoids = this.getBunchMates(this.bunch.attractRadius, this.bunch.attractAngle, ctx);
             var attractionForce = this.calculateAttractionForce(deltaTime, this.attractBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(attractionForce);
         }
 
         if (this.bunch.repel) {
-            this.repelBoids = this.getAllProximityBoids(bunches, this.bunch.repelRadius, ctx);
+            this.repelBoids = this.getAllProximityBoids(bunches, this.bunch.repelRadius, this.bunch.repelAngle, ctx);
             var repelForce = this.calculateRepelForce(deltaTime, this.repelBoids, ctx.canvas.width, ctx.canvas.height);
             acceleration.combine(repelForce);
         }
@@ -56,14 +56,14 @@ class Boid {
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(0,0,255,0.7)";
                 var direction = Math.atan2(this.velocity.y, this.velocity.x);
-                var startAngle = direction + this.bunch.proximityAngle;
-                var endAngle = direction - this.bunch.proximityAngle;
-                if (this.bunch.proximityAngle < Math.PI) {
+                var startAngle = direction + this.bunch.directAngle;
+                var endAngle = direction - this.bunch.directAngle;
+                if (this.bunch.directAngle < Math.PI) {
                     ctx.moveTo(this.position.x, this.position.y);
                     ctx.lineTo(Math.cos(startAngle) + this.position.x, Math.sin(startAngle) + this.position.y);
                 }
                 ctx.arc(this.position.x, this.position.y, this.bunch.directRadius, startAngle, endAngle, true);
-                if (this.bunch.proximityAngle < Math.PI)
+                if (this.bunch.directAngle < Math.PI)
                     ctx.lineTo(this.position.x, this.position.y);
                 ctx.fill();
                 ctx.stroke();
@@ -72,12 +72,12 @@ class Boid {
                 var thisComplimentPositions = this.getComplimentPositions(ctx);
                 thisComplimentPositions.forEach(position => {
                     ctx.beginPath();
-                    if (this.bunch.proximityAngle < Math.PI) {
+                    if (this.bunch.directAngle < Math.PI) {
                         ctx.moveTo(position.x, position.y);
                         ctx.lineTo(Math.cos(startAngle) + position.x, Math.sin(startAngle) + position.y);
                     }
                     ctx.arc(position.x, position.y, this.bunch.directRadius, startAngle, endAngle, true);
-                    if (this.bunch.proximityAngle < Math.PI)
+                    if (this.bunch.directAngle < Math.PI)
                         ctx.lineTo(position.x, position.y);
                     ctx.fill();
                     ctx.stroke();
@@ -90,14 +90,14 @@ class Boid {
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(0,255,0,0.7)";
                 var direction = Math.atan2(this.velocity.y, this.velocity.x);
-                var startAngle = direction + this.bunch.proximityAngle;
-                var endAngle = direction - this.bunch.proximityAngle;
-                if (this.bunch.proximityAngle < Math.PI) {
+                var startAngle = direction + this.bunch.attractAngle;
+                var endAngle = direction - this.bunch.attractAngle;
+                if (this.bunch.attractAngle < Math.PI) {
                     ctx.moveTo(this.position.x, this.position.y);
                     ctx.lineTo(Math.cos(startAngle) + this.position.x, Math.sin(startAngle) + this.position.y);
                 }
                 ctx.arc(this.position.x, this.position.y, this.bunch.attractRadius, startAngle, endAngle, true);
-                if (this.bunch.proximityAngle < Math.PI)
+                if (this.bunch.attractAngle < Math.PI)
                     ctx.lineTo(this.position.x, this.position.y);
                 ctx.fill();
                 ctx.stroke();
@@ -106,12 +106,12 @@ class Boid {
                 var thisComplimentPositions = this.getComplimentPositions(ctx);
                 thisComplimentPositions.forEach(position => {
                     ctx.beginPath();
-                    if (this.bunch.proximityAngle < Math.PI) {
+                    if (this.bunch.attractAngle < Math.PI) {
                         ctx.moveTo(position.x, position.y);
                         ctx.lineTo(Math.cos(startAngle) + position.x, Math.sin(startAngle) + position.y);
                     }
                     ctx.arc(position.x, position.y, this.bunch.attractRadius, startAngle, endAngle, true);
-                    if (this.bunch.proximityAngle < Math.PI)
+                    if (this.bunch.attractAngle < Math.PI)
                         ctx.lineTo(position.x, position.y);
                     ctx.fill();
                     ctx.stroke();
@@ -124,14 +124,14 @@ class Boid {
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
                 ctx.strokeStyle = "rgba(255,0,0,0.7)";
                 var direction = Math.atan2(this.velocity.y, this.velocity.x);
-                var startAngle = direction + this.bunch.proximityAngle;
-                var endAngle = direction - this.bunch.proximityAngle;
-                if (this.bunch.proximityAngle < Math.PI) {
+                var startAngle = direction + this.bunch.repelAngle;
+                var endAngle = direction - this.bunch.repelAngle;
+                if (this.bunch.repelAngle < Math.PI) {
                     ctx.moveTo(this.position.x, this.position.y);
                     ctx.lineTo(Math.cos(startAngle) + this.position.x, Math.sin(startAngle) + this.position.y);
                 }
                 ctx.arc(this.position.x, this.position.y, this.bunch.repelRadius, startAngle, endAngle, true);
-                if (this.bunch.proximityAngle < Math.PI)
+                if (this.bunch.repelAngle < Math.PI)
                     ctx.lineTo(this.position.x, this.position.y);
                 ctx.fill();
                 ctx.stroke();
@@ -140,12 +140,12 @@ class Boid {
                 var thisComplimentPositions = this.getComplimentPositions(ctx);
                 thisComplimentPositions.forEach(position => {
                     ctx.beginPath();
-                    if (this.bunch.proximityAngle < Math.PI) {
+                    if (this.bunch.repelAngle < Math.PI) {
                         ctx.moveTo(position.x, position.y);
                         ctx.lineTo(Math.cos(startAngle) + position.x, Math.sin(startAngle) + position.y);
                     }
                     ctx.arc(position.x, position.y, this.bunch.repelRadius, startAngle, endAngle, true);
-                    if (this.bunch.proximityAngle < Math.PI)
+                    if (this.bunch.repelAngle < Math.PI)
                         ctx.lineTo(position.x, position.y);
                     ctx.fill();
                     ctx.stroke();
@@ -519,7 +519,7 @@ class Boid {
         }
     }
 
-    getFlockMates = (radius, ctx) => {
+    getBunchMates = (radius, angle, ctx) => {
         var proximityBoids = [];
         var myAngle = Math.atan2(this.velocity.y, this.velocity.x) + Math.PI; //0 to 2PI
 
@@ -555,19 +555,19 @@ class Boid {
             }
 
             var displacement = new Vector2(xDiff, yDiff);
-            var angle = Math.atan2(yDiff, xDiff) + Math.PI; //0 to 2PI
-            var leftAngle = (angle + 2 * Math.PI - myAngle) % (2 * Math.PI);
-            var rightAngle = (myAngle + 2 * Math.PI - angle) % (2 * Math.PI);
+            var angleToTarget = Math.atan2(yDiff, xDiff) + Math.PI; //0 to 2PI
+            var leftAngle = (angleToTarget + 2 * Math.PI - myAngle) % (2 * Math.PI);
+            var rightAngle = (myAngle + 2 * Math.PI - angleToTarget) % (2 * Math.PI);
             if (displacement.squareMagnitude <= radius*radius
-                && (leftAngle <= this.bunch.proximityAngle
-                    || rightAngle <= this.bunch.proximityAngle))
+                && (leftAngle <= angle
+                    || rightAngle <= angle))
                 proximityBoids.push(boid);
         });
 
         return proximityBoids;
     }
 
-    getAllProximityBoids = (bunches, radius, ctx) => {
+    getAllProximityBoids = (bunches, radius, angle, ctx) => {
         var proximityBoids = [];
         var myAngle = Math.atan2(this.velocity.y, this.velocity.x) + Math.PI; //0 to 2PI
 
@@ -604,12 +604,12 @@ class Boid {
                 }
 
                 var displacement = new Vector2(xDiff, yDiff);
-                var angle = Math.atan2(yDiff, xDiff) + Math.PI; //0 to 2PI
-                var leftAngle = (angle + 2 * Math.PI - myAngle) % (2 * Math.PI);
-                var rightAngle = (myAngle + 2 * Math.PI - angle) % (2 * Math.PI);
+                var angleToTarget = Math.atan2(yDiff, xDiff) + Math.PI; //0 to 2PI
+                var leftAngle = (angleToTarget + 2 * Math.PI - myAngle) % (2 * Math.PI);
+                var rightAngle = (myAngle + 2 * Math.PI - angleToTarget) % (2 * Math.PI);
                 if (displacement.squareMagnitude <= radius*radius
-                    && (leftAngle <= this.bunch.proximityAngle
-                        || rightAngle <= this.bunch.proximityAngle))
+                    && (leftAngle <= angle
+                        || rightAngle <= angle))
                     proximityBoids.push(boid);
             });
         });
@@ -657,7 +657,7 @@ class Boid {
             var currentAttractForce = new Vector2(xDiff, yDiff);
             var d = currentAttractForce.magnitude;
             var r = this.bunch.attractRadius;
-            currentAttractForce = currentAttractForce.normalize().mult(-10/(-d+1+r)).mult(10);
+            currentAttractForce = currentAttractForce.normalize().mult(-10/(-d+1+r)).mult(10).mult(this.bunch.attractScale);;
             attractForce.combine(currentAttractForce);
         });
         // averagePosition.mult(-1/boids.length);
@@ -703,9 +703,13 @@ class Boid {
             
             var currentRepelForce = new Vector2(xDiff, yDiff);
             var d = currentRepelForce.magnitude;
+
             currentRepelForce = currentRepelForce.normalize().mult(10/(d + 1)).mult(50);
-            if (boid.bunch !== this.bunch)
-                currentRepelForce.mult(2);
+            if (boid.bunch === this.bunch)
+                currentRepelForce.mult(this.bunch.repelLikeScale);
+            else
+            currentRepelForce.mult(this.bunch.repelOtherScale);
+
             repelForce.combine(currentRepelForce);
         });
 
@@ -727,7 +731,7 @@ class Boid {
                 averageVelocity = this.velocity.copy();
         }
 
-        return averageVelocity.normalize().mult(this.bunch.baseAcceleration);
+        return averageVelocity.normalize().mult(this.bunch.baseAcceleration).mult(this.bunch.directScale);
     }
 
     calculateVelocity(deltaTime) {
