@@ -4,7 +4,6 @@ import useAnimationFrame from './useAnimationFrame';
 import Bunch from './classes/bunch';
 import Boid from './classes/boid';
 import Vector2 from './classes/vector2';
-import DrawAll from './components/drawAll';
 import BunchController from './components/bunchController';
 
 function App() {
@@ -83,10 +82,12 @@ function App() {
     return (
         <div className="App">
             <canvas id="canvas" ref={canvasEl} width={dimensions.width} height={dimensions.height}></canvas>
-            {bunches.map((bunch, idx) => {
-                return (<BunchController bunch={bunch} dimensions={dimensions} key={idx}/>)
-            })}
-            {divStats}
+            <div className="bunch-controllers">
+                {bunches.map((bunch, idx) => {
+                    return (<BunchController bunch={bunch} dimensions={dimensions} key={idx}/>)
+                })}
+                {divStats}
+            </div>
         </div>
     );
 }

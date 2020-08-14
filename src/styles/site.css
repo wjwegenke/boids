@@ -4,6 +4,26 @@ html, body {
   height: 100%;
   width: 100%;
   color: white;
+  overflow: hidden;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Track */
+*::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+/* Handle */
+*::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+          box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
 }
 
 canvas {
@@ -15,7 +35,25 @@ canvas {
   position: relative;
 }
 
-.App div {
-  position: relative;
+.bunch-controllers {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 400px;
+}
+
+.bunch-controllers .bunch-controller {
+  border-radius: 10px;
+  margin: 5px;
+  padding: 10px;
+  background-color: rgba(150, 150, 150, 0.3);
+  border: 1px solid #FFFFFF55;
+}
+
+.bunch-controllers .bunch-controller .tab-body {
+  -webkit-transition: height 0.25s ease-in-out;
+  transition: height 0.25s ease-in-out;
+  overflow: hidden;
+  height: 0;
 }
 /*# sourceMappingURL=site.css.map */
