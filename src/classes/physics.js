@@ -1,11 +1,11 @@
 import Vector2 from './vector2';
 
-export const pixelsPerMeter = 5;
+export const pixelsPerMeter = 10;
 export const maxSpeed = 100;
+export const dragConstant = 0.1;
 
 export function calculateDragMagnitude(squareSpeed) {
-    var k = 0.1; //0.0028125
-    var dragMagnitude = k * squareSpeed
+    var dragMagnitude = dragConstant * squareSpeed
     return dragMagnitude;
 }
 

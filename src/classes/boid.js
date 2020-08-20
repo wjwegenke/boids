@@ -38,7 +38,8 @@ class Boid {
 
         acceleration.limitMagnitude(this.bunch.maxAcceleration);
 
-        this.acceleration = acceleration.combine(dragForce);
+        //this.acceleration = acceleration.combine(dragForce);
+        this.acceleration = acceleration;
         this.prevVelocity = this.velocity;
     }
 
@@ -735,17 +736,34 @@ class Boid {
     }
 
     calculateVelocity(deltaTime) {
-        this.velocity = this.prevVelocity.copy().combine(this.acceleration.copy().mult(deltaTime / 1000));
-        this.velocity.limitMagnitude(physics.maxSpeed);
+        //v(t) = (ma/k) - ((ma/k) - v(0))e^(-kt/m))
+        //let m = k
+        const dt = deltaTime / 1000;
+        let a = this.acceleration.copy();//.mult(1 / physics.dragConstant);
+        let b = a.copy().combine(this.prevVelocity.copy().mult(-1));
+        let c = Math.pow(Math.E, -dt); //Math.pow(Math.E, -physics.dragConstant * dt);
+        this.velocity = a.combine(b.mult(-c));
+
+        //this.velocity = this.prevVelocity.copy().combine(this.acceleration.copy().mult(deltaTime / 1000));
+        //this.velocity.limitMagnitude(physics.maxSpeed);
         this.velocity.limitMagnitudeMin(this.bunch.minSpeed);
     }
 
     calculatePosition(deltaTime, width, height) {
-        var displacement = new Vector2();
-        displacement.x = (this.velocity.x + this.prevVelocity.x) * deltaTime / 2000 * physics.pixelsPerMeter;
-        displacement.y = (this.velocity.y + this.prevVelocity.y) * deltaTime / 2000 * physics.pixelsPerMeter;
-        displacement.mult(2);
-        this.position = this.position.combine(displacement);
+        //var displacement = new Vector2();
+        //(ma/k)t + (((ma/k) - v(0))/k)e^(-kt/m))
+        //let m = k
+        const dt = deltaTime / 1000;
+        let a = this.acceleration.copy(); //.mult(1 / physics.dragConstant);
+        let b = a.copy().combine(this.prevVelocity.copy().mult(-1));
+        let c = Math.pow(Math.E, -dt); //Math.pow(Math.E, -physics.dragConstant * dt);
+        let d = a.mult(dt).combine(b.copy().mult(c)).combine(b.mult(-1));
+
+        // displacement.x = (this.velocity.x + this.prevVelocity.x) * deltaTime / 1000 * physics.pixelsPerMeter;
+        // displacement.y = (this.velocity.y + this.prevVelocity.y) * deltaTime / 1000 * physics.pixelsPerMeter;
+        // displacement.mult(2);
+        // this.position = this.position.combine(displacement);
+        this.position = this.position.combine(d.mult(physics.pixelsPerMeter));
         if (this.position.x < 0 || this.position.x > width)
             this.position.x = (this.position.x % width + width) % width;
         if (this.position.y < 0 || this.position.y > height)
