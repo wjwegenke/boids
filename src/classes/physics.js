@@ -32,3 +32,9 @@ export function getDistance(vector2A, vector2B) {
     var y = vector2A.y - vector2B.y;
     return Math.sqrt(x*x + y*y);
 }
+
+export function getSquareDistance(vector2A, vector2B) {
+    var x = vector2A.x - vector2B.x;
+    var y = vector2A.y - vector2B.y;
+    return x*x + y*y;
+}
