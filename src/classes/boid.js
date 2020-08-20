@@ -12,7 +12,7 @@ class Boid {
     update = (deltaTime, ctx, bunches) => {
         //Calculate acceleration
         let acceleration = new Vector2();
-        const dragForce = physics.calculateDragForce(this.velocity);
+        //const dragForce = physics.calculateDragForce(this.velocity);
 
         //const allProximityBoids = this.getAllProximityBoids(bunches, Math.max(this.bunch.directRadius, this.bunch.attractRadius, this.bunch.repelRadius), ctx);
 
@@ -55,7 +55,7 @@ class Boid {
             if (this.bunch.drawDirectRadius) {
                 ctx.beginPath();
                 ctx.fillStyle = "rgba(100,100,100,0.2)";
-                ctx.strokeStyle = "rgba(0,0,255,0.7)";
+                ctx.strokeStyle = "rgba(0,80,255,0.7)";
                 const direction = Math.atan2(this.velocity.y, this.velocity.x);
                 const startAngle = direction + this.bunch.directAngle;
                 const endAngle = direction - this.bunch.directAngle;
@@ -176,11 +176,11 @@ class Boid {
                 ctx.closePath();
             }
 
-            if (this.bunch.drawAttraction)
-                this.drawAttraction(ctx);
-
             if (this.bunch.drawRepel)
                 this.drawRepel(ctx);
+
+            if (this.bunch.drawAttraction)
+                this.drawAttraction(ctx);
 
             if (this.bunch.drawDirection)
                 this.drawDirection(ctx);
@@ -212,6 +212,7 @@ class Boid {
     }
 
     drawAttraction(ctx) {
+        const d = 15;
         for (let i = 0; i < this.attractBoids.length; i++) {
             const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
             grd.addColorStop(0, 'rgb(0,255,0)');
@@ -227,6 +228,11 @@ class Boid {
                                             squareDistance1,
                                             squareDistance2)
             if (minSquareDistance === squareDistance) {
+                const midPoint = new Vector2((this.position.x + this.attractBoids[i].position.x) / 2, (this.position.y + this.attractBoids[i].position.y) / 2);
+                const a = this.position.y - midPoint.y;
+                const b = this.position.x - midPoint.x;
+                const theta = Math.atan(Math.abs(b / a));
+                const offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 grd.addColorStop(0, 'rgb(0,255,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -235,10 +241,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(this.attractBoids[i].position.x, this.attractBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance0) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[0].x) / 2, (this.position.y + otherComplimentPositions[0].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
                 grd.addColorStop(0, 'rgb(0,255,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -247,10 +258,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[0].x + this.attractBoids[i].position.x) / 2, (thisComplimentPositions[0].y + this.attractBoids[i].position.y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(0,255,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -259,10 +275,15 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
-                ctx.lineTo(this.attractBoids[i].position.x, this.attractBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance1) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[1].x) / 2, (this.position.y + otherComplimentPositions[1].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
                 grd.addColorStop(0, 'rgb(0,255,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -271,10 +292,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[1].x + this.attractBoids[i].position.x) / 2, (thisComplimentPositions[1].y + this.attractBoids[i].position.y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(0,255,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -283,10 +309,15 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
-                ctx.lineTo(this.attractBoids[i].position.x, this.attractBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance2) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[2].x) / 2, (this.position.y + otherComplimentPositions[2].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
                 grd.addColorStop(0, 'rgb(0,255,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -295,10 +326,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[2].x, otherComplimentPositions[2].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[2].x + this.attractBoids[i].position.x) / 2, (thisComplimentPositions[2].y + this.attractBoids[i].position.y) / 2);
+                a = thisComplimentPositions[2].y - midPoint.y;
+                b = thisComplimentPositions[2].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[2].x, thisComplimentPositions[2].y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(0,255,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -307,7 +343,75 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[2].x, thisComplimentPositions[2].y);
-                ctx.lineTo(this.attractBoids[i].position.x, this.attractBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.attractBoids[i].position.x, this.attractBoids[i].position.y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((thisComplimentPositions[0].x + otherComplimentPositions[1].x) / 2, (thisComplimentPositions[0].y + otherComplimentPositions[1].y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd3 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                grd3.addColorStop(0, 'rgb(0,255,0)');
+                grd3.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd3;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((thisComplimentPositions[1].x + otherComplimentPositions[0].x) / 2, (thisComplimentPositions[1].y + otherComplimentPositions[0].y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd4 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                grd4.addColorStop(0, 'rgb(0,255,0)');
+                grd4.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd4;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[0].x + thisComplimentPositions[1].x) / 2, (otherComplimentPositions[0].y + thisComplimentPositions[1].y) / 2);
+                a = otherComplimentPositions[0].y - midPoint.y;
+                b = otherComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd5 = ctx.createLinearGradient(otherComplimentPositions[0].x, otherComplimentPositions[0].y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                grd5.addColorStop(0, 'rgb(0,255,0)');
+                grd5.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd5;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[1].x + thisComplimentPositions[0].x) / 2, (otherComplimentPositions[1].y + thisComplimentPositions[0].y) / 2);
+                a = otherComplimentPositions[1].y - midPoint.y;
+                b = otherComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd6 = ctx.createLinearGradient(otherComplimentPositions[1].x, otherComplimentPositions[1].y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                grd6.addColorStop(0, 'rgb(0,255,0)');
+                grd6.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd6;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
             }
@@ -315,6 +419,7 @@ class Boid {
     }
     
     drawRepel(ctx) {
+        const d = 5;
         for (let i = 0; i < this.repelBoids.length; i++) {
             const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
             grd.addColorStop(0, 'rgb(255,0,0)');
@@ -330,6 +435,11 @@ class Boid {
                                             squareDistance1,
                                             squareDistance2)
             if (minSquareDistance === squareDistance) {
+                const midPoint = new Vector2((this.position.x + this.repelBoids[i].position.x) / 2, (this.position.y + this.repelBoids[i].position.y) / 2);
+                const a = this.position.y - midPoint.y;
+                const b = this.position.x - midPoint.x;
+                const theta = Math.atan(Math.abs(b / a));
+                const offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 grd.addColorStop(0, 'rgb(255,0,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -338,10 +448,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(this.repelBoids[i].position.x, this.repelBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance0) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[0].x) / 2, (this.position.y + otherComplimentPositions[0].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
                 grd.addColorStop(0, 'rgb(255,0,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -350,10 +465,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[0].x + this.repelBoids[i].position.x) / 2, (thisComplimentPositions[0].y + this.repelBoids[i].position.y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(255,0,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -362,10 +482,15 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
-                ctx.lineTo(this.repelBoids[i].position.x, this.repelBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance1) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[1].x) / 2, (this.position.y + otherComplimentPositions[1].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
                 grd.addColorStop(0, 'rgb(255,0,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -374,10 +499,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[1].x + this.repelBoids[i].position.x) / 2, (thisComplimentPositions[1].y + this.repelBoids[i].position.y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(255,0,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -386,10 +516,15 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
-                ctx.lineTo(this.repelBoids[i].position.x, this.repelBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance2) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[2].x) / 2, (this.position.y + otherComplimentPositions[2].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
                 grd.addColorStop(0, 'rgb(255,0,0)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
@@ -398,10 +533,15 @@ class Boid {
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[2].x, otherComplimentPositions[2].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[2].x + this.repelBoids[i].position.x) / 2, (thisComplimentPositions[2].y + this.repelBoids[i].position.y) / 2);
+                a = thisComplimentPositions[2].y - midPoint.y;
+                b = thisComplimentPositions[2].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[2].x, thisComplimentPositions[2].y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
                 grd2.addColorStop(0, 'rgb(255,0,0)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
@@ -410,7 +550,75 @@ class Boid {
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[2].x, thisComplimentPositions[2].y);
-                ctx.lineTo(this.repelBoids[i].position.x, this.repelBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.repelBoids[i].position.x, this.repelBoids[i].position.y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((thisComplimentPositions[0].x + otherComplimentPositions[1].x) / 2, (thisComplimentPositions[0].y + otherComplimentPositions[1].y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd3 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                grd3.addColorStop(0, 'rgb(255,0,0)');
+                grd3.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd3;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((thisComplimentPositions[1].x + otherComplimentPositions[0].x) / 2, (thisComplimentPositions[1].y + otherComplimentPositions[0].y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd4 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                grd4.addColorStop(0, 'rgb(255,0,0)');
+                grd4.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd4;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[0].x + thisComplimentPositions[1].x) / 2, (otherComplimentPositions[0].y + thisComplimentPositions[1].y) / 2);
+                a = otherComplimentPositions[0].y - midPoint.y;
+                b = otherComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd5 = ctx.createLinearGradient(otherComplimentPositions[0].x, otherComplimentPositions[0].y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                grd5.addColorStop(0, 'rgb(255,0,0)');
+                grd5.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd5;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[1].x + thisComplimentPositions[0].x) / 2, (otherComplimentPositions[1].y + thisComplimentPositions[0].y) / 2);
+                a = otherComplimentPositions[1].y - midPoint.y;
+                b = otherComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd6 = ctx.createLinearGradient(otherComplimentPositions[1].x, otherComplimentPositions[1].y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                grd6.addColorStop(0, 'rgb(255,0,0)');
+                grd6.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd6;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
             }
@@ -418,6 +626,7 @@ class Boid {
     }
     
     drawDirection(ctx) {
+        const d = 25;
         for (let i = 0; i < this.directBoids.length; i++) {
             const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
             grd.addColorStop(0, 'rgb(0,0,255)');
@@ -433,87 +642,191 @@ class Boid {
                                             squareDistance1,
                                             squareDistance2)
             if (minSquareDistance === squareDistance) {
+                const midPoint = new Vector2((this.position.x + this.directBoids[i].position.x) / 2, (this.position.y + this.directBoids[i].position.y) / 2);
+                const a = this.position.y - midPoint.y;
+                const b = this.position.x - midPoint.x;
+                const theta = Math.atan(Math.abs(b / a));
+                const offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
-                grd.addColorStop(0, 'rgb(0,0,255)');
+                grd.addColorStop(0, 'rgb(0,80,255)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(this.directBoids[i].position.x, this.directBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance0) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[0].x) / 2, (this.position.y + otherComplimentPositions[0].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
-                grd.addColorStop(0, 'rgb(0,0,255)');
+                grd.addColorStop(0, 'rgb(0,80,255)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[0].x + this.directBoids[i].position.x) / 2, (thisComplimentPositions[0].y + this.directBoids[i].position.y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, this.directBoids[i].position.x, this.directBoids[i].position.y);
-                grd2.addColorStop(0, 'rgb(0,0,255)');
+                grd2.addColorStop(0, 'rgb(0,80,255)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
-                ctx.lineTo(this.directBoids[i].position.x, this.directBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance1) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[1].x) / 2, (this.position.y + otherComplimentPositions[1].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
-                grd.addColorStop(0, 'rgb(0,0,255)');
+                grd.addColorStop(0, 'rgb(0,80,255)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[1].x + this.directBoids[i].position.x) / 2, (thisComplimentPositions[1].y + this.directBoids[i].position.y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, this.directBoids[i].position.x, this.directBoids[i].position.y);
-                grd2.addColorStop(0, 'rgb(0,0,255)');
+                grd2.addColorStop(0, 'rgb(0,80,255)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
-                ctx.lineTo(this.directBoids[i].position.x, this.directBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
                 ctx.stroke();
                 ctx.closePath();
             } else if (minSquareDistance === squareDistance2) {
+                let midPoint = new Vector2((this.position.x + otherComplimentPositions[2].x) / 2, (this.position.y + otherComplimentPositions[2].y) / 2);
+                let a = this.position.y - midPoint.y;
+                let b = this.position.x - midPoint.x;
+                let theta = Math.atan(Math.abs(b / a));
+                let offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd = ctx.createLinearGradient(this.position.x, this.position.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
-                grd.addColorStop(0, 'rgb(0,0,255)');
+                grd.addColorStop(0, 'rgb(0,80,255)');
                 grd.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd;
                 ctx.lineWidth = 3;
                 ctx.moveTo(this.position.x, this.position.y);
-                ctx.lineTo(otherComplimentPositions[2].x, otherComplimentPositions[2].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[2].x, otherComplimentPositions[2].y);
                 ctx.stroke();
                 ctx.closePath();
                 
+                midPoint = new Vector2((thisComplimentPositions[2].x + this.directBoids[i].position.x) / 2, (thisComplimentPositions[2].y + this.directBoids[i].position.y) / 2);
+                a = thisComplimentPositions[2].y - midPoint.y;
+                b = thisComplimentPositions[2].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
                 const grd2 = ctx.createLinearGradient(thisComplimentPositions[2].x, thisComplimentPositions[2].y, this.directBoids[i].position.x, this.directBoids[i].position.y);
-                grd2.addColorStop(0, 'rgb(0,0,255)');
+                grd2.addColorStop(0, 'rgb(0,80,255)');
                 grd2.addColorStop(1, 'rgba(0,0,0,0)');
 
                 ctx.beginPath();
                 ctx.strokeStyle = grd2;
                 ctx.lineWidth = 3;
                 ctx.moveTo(thisComplimentPositions[2].x, thisComplimentPositions[2].y);
-                ctx.lineTo(this.directBoids[i].position.x, this.directBoids[i].position.y);
+                ctx.quadraticCurveTo(offset.x, offset.y, this.directBoids[i].position.x, this.directBoids[i].position.y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((thisComplimentPositions[0].x + otherComplimentPositions[1].x) / 2, (thisComplimentPositions[0].y + otherComplimentPositions[1].y) / 2);
+                a = thisComplimentPositions[0].y - midPoint.y;
+                b = thisComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd3 = ctx.createLinearGradient(thisComplimentPositions[0].x, thisComplimentPositions[0].y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                grd3.addColorStop(0, 'rgb(0,80,255)');
+                grd3.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd3;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                
+                midPoint = new Vector2((thisComplimentPositions[1].x + otherComplimentPositions[0].x) / 2, (thisComplimentPositions[1].y + otherComplimentPositions[0].y) / 2);
+                a = thisComplimentPositions[1].y - midPoint.y;
+                b = thisComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd4 = ctx.createLinearGradient(thisComplimentPositions[1].x, thisComplimentPositions[1].y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                grd4.addColorStop(0, 'rgb(0,80,255)');
+                grd4.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd4;
+                ctx.lineWidth = 3;
+                ctx.moveTo(thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[0].x + thisComplimentPositions[1].x) / 2, (otherComplimentPositions[0].y + thisComplimentPositions[1].y) / 2);
+                a = otherComplimentPositions[0].y - midPoint.y;
+                b = otherComplimentPositions[0].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd5 = ctx.createLinearGradient(otherComplimentPositions[0].x, otherComplimentPositions[0].y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                grd5.addColorStop(0, 'rgb(0,80,255)');
+                grd5.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd5;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[0].x, otherComplimentPositions[0].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[1].x, thisComplimentPositions[1].y);
+                ctx.stroke();
+                ctx.closePath();
+                
+                midPoint = new Vector2((otherComplimentPositions[1].x + thisComplimentPositions[0].x) / 2, (otherComplimentPositions[1].y + thisComplimentPositions[0].y) / 2);
+                a = otherComplimentPositions[1].y - midPoint.y;
+                b = otherComplimentPositions[1].x - midPoint.x;
+                theta = Math.atan(Math.abs(b / a));
+                offset = new Vector2(midPoint.x + Math.cos(theta) * d * (a < 0 ? -1 : 1), midPoint.y + Math.sin(theta) * d * (b < 0 ? 1 : -1));
+                const grd6 = ctx.createLinearGradient(otherComplimentPositions[1].x, otherComplimentPositions[1].y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
+                grd6.addColorStop(0, 'rgb(0,80,255)');
+                grd6.addColorStop(1, 'rgba(0,0,0,0)');
+
+                ctx.beginPath();
+                ctx.strokeStyle = grd6;
+                ctx.lineWidth = 3;
+                ctx.moveTo(otherComplimentPositions[1].x, otherComplimentPositions[1].y);
+                ctx.quadraticCurveTo(offset.x, offset.y, thisComplimentPositions[0].x, thisComplimentPositions[0].y);
                 ctx.stroke();
                 ctx.closePath();
             }
