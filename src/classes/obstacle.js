@@ -4,9 +4,6 @@ import * as physics from './physics';
 class Obstacle {
     constructor(position) {
         this.position = position || new Vector2();
-        this.color = 'grey';
-        this.highlightColor = 'cyan';
-        this.size = 8;
         this.isSelected = false;
     }
 
@@ -21,30 +18,30 @@ class Obstacle {
     draw(ctx) {
         //Update self to canvas
         ctx.beginPath();
-        ctx.fillStyle = this.color;
-        ctx.arc(this.position.x, this.position.y, this.size, 0, 2 * Math.PI, true);
+        ctx.fillStyle = this.obstacleManager.color;
+        ctx.arc(this.position.x, this.position.y, this.obstacleManager.size, 0, 2 * Math.PI, true);
         ctx.fill();
         if (this.isSelected) {
             ctx.lineWidth = 2;
-            ctx.strokeStyle = this.highlightColor;
+            ctx.strokeStyle = this.obstacleManager.highlightColor;
             ctx.stroke();
         }
         ctx.closePath();
 
         //Draw on opposite side of screen if it overlaps
-        if (this.position.x < this.size
-            || this.position.y < this.size
-            || ctx.canvas.width - this.position.x < this.size
-            || ctx.canvas.height - this.position.y < this.size) {
+        if (this.position.x < this.obstacleManager.size
+            || this.position.y < this.obstacleManager.size
+            || ctx.canvas.width - this.position.x < this.obstacleManager.size
+            || ctx.canvas.height - this.position.y < this.obstacleManager.size) {
             const compliments = physics.getComplimentPositions(this.position, ctx);
             for (let i = 0; i < compliments.length; i++) {
                 ctx.beginPath();
-                ctx.fillStyle = this.color;
-                ctx.arc(compliments[i].x, compliments[i].y, this.size, 0, 2 * Math.PI, true);
+                ctx.fillStyle = this.obstacleManager.color;
+                ctx.arc(compliments[i].x, compliments[i].y, this.obstacleManager.size, 0, 2 * Math.PI, true);
                 ctx.fill();
                 if (this.isSelected) {
                     ctx.lineWidth = 2;
-                    ctx.strokeStyle = this.highlightColor;
+                    ctx.strokeStyle = this.obstacleManager.highlightColor;
                     ctx.stroke();
                 }
                 ctx.closePath();

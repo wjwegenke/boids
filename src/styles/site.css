@@ -35,25 +35,57 @@ canvas {
   position: relative;
 }
 
-.bunch-controllers {
+.controllers {
   position: absolute;
   right: 10px;
   top: 10px;
   width: 400px;
 }
 
-.bunch-controllers .bunch-controller {
-  border-radius: 10px;
+.controllers .controller {
+  border-radius: 8px;
   margin: 5px;
-  padding: 10px;
+  padding: 8px;
   background-color: rgba(150, 150, 150, 0.3);
   border: 1px solid #FFFFFF55;
 }
 
-.bunch-controllers .bunch-controller .tab-body {
+.controllers .controller .controller-header, .controllers .controller .options-header {
+  height: 30px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.controllers .controller .controller-header .controller-icon, .controllers .controller .options-header .controller-icon {
+  height: 30px;
+}
+
+.controllers .controller .controller-header .controller-icon canvas, .controllers .controller .options-header .controller-icon canvas {
+  border-radius: 5px;
+}
+
+.controllers .controller .controller-body, .controllers .controller .options-body {
+  margin: 0px 10px;
   -webkit-transition: height 0.25s ease-in-out;
   transition: height 0.25s ease-in-out;
   overflow: hidden;
   height: 0;
+}
+
+.expander {
+  height: 20px;
+  width: 20px;
+  cursor: pointer;
 }
 /*# sourceMappingURL=site.css.map */

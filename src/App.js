@@ -6,6 +6,8 @@ import Boid from './classes/boid';
 import Vector2 from './classes/vector2';
 import BunchController from './components/bunchController';
 import Obstacle from './classes/obstacle';
+import ObstacleManager from './classes/obstacleManager';
+import ObstacleController from './components/obstacleController';
 
 function App() {
     const canvasEl = useRef(null);
@@ -14,7 +16,8 @@ function App() {
         width: window.innerWidth
     });
     const [bunches, setBunches] = useState([]);
-    const [obstacles, setObstacles] = useState([]);
+    const [obstacleManager, setObstacleManager] = useState(new ObstacleManager());
+    obstacleManager.dimensions = dimensions;
     bunches.forEach(bunch => bunch.dimensions = dimensions);
     const [ctx, setCtx] = useState(null);
     const [fps, setFps] = useState(0);
@@ -30,10 +33,19 @@ function App() {
         }
 
         window.addEventListener('resize', handleResize);
+        // // Set up CSS size.
+        // canvasEl.current.style.width = canvasEl.current.style.width || canvasEl.current.width + 'px';
+        // canvasEl.current.style.height = canvasEl.current.style.height || canvasEl.current.height + 'px';
+
+        // // Resize canvas and scale future draws.
+        // var scaleFactor = 2;//dpi / 96;
+        // canvasEl.current.width = Math.ceil(canvasEl.current.width * scaleFactor);
+        // canvasEl.current.height = Math.ceil(canvasEl.current.height * scaleFactor);
         let thisCtx = canvasEl.current.getContext('2d');
+        // thisCtx.scale(scaleFactor, scaleFactor);
         
         const bunch = new Bunch();
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
             position.x = Math.random() * canvasEl.current.width;
@@ -46,7 +58,7 @@ function App() {
         
         const bunch2 = new Bunch();
         bunch2.color = 'coral';
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 50; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
             position.x = Math.random() * canvasEl.current.width;
@@ -57,15 +69,16 @@ function App() {
             bunch2.addBoid(boid);
         }
 
-        const obstacleObjects = [];
-        for (let i = 0; i < 25; i++) {
-            const position = new Vector2();
-            position.x = Math.random() * canvasEl.current.width;
-            position.y = Math.random() * canvasEl.current.height;
-            const obstacle = new Obstacle(position);
-            obstacleObjects.push(obstacle);
-        }
-        setObstacles(obstacleObjects);
+        // const obstacleObjects = [];
+        // for (let i = 0; i < 25; i++) {
+        //     const position = new Vector2();
+        //     position.x = Math.random() * canvasEl.current.width;
+        //     position.y = Math.random() * canvasEl.current.height;
+        //     const obstacle = new Obstacle(position);
+        //     obstacleObjects.push(obstacle);
+        // }
+        // setObstacles(obstacleObjects);
+        obstacleManager.count = 25;
 
         setBunches([bunch, bunch2]);
         setCtx(thisCtx);
@@ -81,17 +94,17 @@ function App() {
         setDTime(Math.round(aveDeltaTime));
         setFps(Math.round(1000 / aveDeltaTime));
         bunches.forEach(bunch => {
-            bunch.update(deltaTime, ctx, bunches, obstacles)
+            bunch.update(deltaTime, ctx, bunches, obstacleManager.obstacles)
         });
-        obstacles.forEach(obstacle => obstacle.update(ctx));
+        obstacleManager.obstacles.forEach(obstacle => obstacle.update(ctx));
         bunches.forEach(bunch => bunch.lateUpdate(deltaTime, ctx));
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         bunches.forEach(bunch => bunch.draw(ctx));
-        obstacles.forEach(obstacle => obstacle.draw(ctx));
+        obstacleManager.obstacles.forEach(obstacle => obstacle.draw(ctx));
         bunches.forEach(bunch => bunch.lateDraw(ctx));
     });
 
-    const showStats = true;
+    const showStats = false;
     const divStats = showStats ? (<div id="stats">
                                     <span>FPS:</span><span id="statFPS">{fps}</span><br/>
                                     <span>Delta Time:</span><span id="statDeltaTime">{dTime}</span><br/>
@@ -105,7 +118,8 @@ function App() {
     return (
         <div className="App">
             <canvas id="canvas" ref={canvasEl} width={dimensions.width} height={dimensions.height}></canvas>
-            <div className="bunch-controllers">
+            <div className="controllers">
+                <ObstacleController obstacleManager={obstacleManager}/>
                 {bunches.map((bunch, idx) => {
                     return (<BunchController bunch={bunch} dimensions={dimensions} key={idx}/>)
                 })}

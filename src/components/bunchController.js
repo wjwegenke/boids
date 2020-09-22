@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 function BunchController(props) {
     const [isControllerBodyOpen, setIsControllerBodyOpen] = useState(false);
@@ -8,6 +8,24 @@ function BunchController(props) {
     let controllerBody = useRef(null);
     let drawBody = useRef(null);
     let behavioralBody = useRef(null);
+    const canvasEl = useRef(null);
+    const [iconCtx, setIconCtx] = useState(null);
+    const ctxScale = 2;
+
+    useEffect(() => {
+        // Set up CSS size.
+        canvasEl.current.style.width = canvasEl.current.style.width || canvasEl.current.width + 'px';
+        canvasEl.current.style.height = canvasEl.current.style.height || canvasEl.current.height + 'px';
+
+        // Resize canvas and scale future draws.
+        var scaleFactor = ctxScale;//dpi / 96;
+        canvasEl.current.width = Math.ceil(canvasEl.current.width * scaleFactor);
+        canvasEl.current.height = Math.ceil(canvasEl.current.height * scaleFactor);
+
+        const thisIconCtx = canvasEl.current.getContext('2d');
+        thisIconCtx.scale(scaleFactor, scaleFactor);
+        setIconCtx(thisIconCtx);
+    }, []);
 
     function toggleProperty(evt, propertyName) {
         props.bunch[propertyName] = evt.currentTarget.checked;
@@ -23,6 +41,22 @@ function BunchController(props) {
 
     function selectTab(isOpen, setOpen) {
         setOpen(!isOpen);
+    }
+
+    if (iconCtx) {
+        iconCtx.clearRect(0, 0, iconCtx.canvas.width, iconCtx.canvas.height);
+        iconCtx.beginPath();
+        //Base
+        iconCtx.fillStyle = props.bunch.color;
+        iconCtx.arc(iconCtx.canvas.width/(2*ctxScale), iconCtx.canvas.height/(2*ctxScale), props.bunch.size, 0, 2 * Math.PI, true);
+        iconCtx.fill();
+        
+        //Highlight
+        // iconCtx.lineWidth = 2;
+        // iconCtx.strokeStyle = props.bunch.highlightColor;
+        // iconCtx.stroke();
+
+        iconCtx.closePath();
     }
 
     let controllerBodyHeight = 0;
@@ -45,22 +79,24 @@ function BunchController(props) {
     }
 
     return (
-        <div className="bunch-controller">
-            <div className="bunch-header" onClick={(evt) => selectTab(isControllerBodyOpen, setIsControllerBodyOpen)}>
-                <div className="bunch-icon"></div>
-                <div className="bunch-count"></div>
-                    <div className="slider-control">
-                        <label>Count</label>
-                        <input type="range" min="1" max="200" className="slider" value={props.bunch.count} onChange={(evt) => setProperty(evt, "count")}/>
-                    </div>
-                <div className="expander"></div>
+        <div className="controller">
+            <div className="controller-header">
+                <div className="controller-icon">
+                    <canvas ref={canvasEl} width="30px" height="30px"></canvas>
+                </div>
+                <div className="controller-label">Bunch</div>
+                <div className="slider-control">
+                    <input type="range" min="1" max="50" className="slider" value={props.bunch.count} onChange={(evt) => setProperty(evt, "count")}/>
+                </div>
+                <div className="expander" onClick={(evt) => selectTab(isControllerBodyOpen, setIsControllerBodyOpen)}>v</div>
             </div>
-            <div className="tab-body" ref={controllerBody} style={{height: controllerBodyHeight + 'px'}}>
+            <div className="controller-body" ref={controllerBody} style={{height: controllerBodyHeight + 'px'}}>
                 <div className="draw-options">
-                    <div className="tab-header" onClick={(evt) => selectTab(isDrawBodyOpen, setIsDrawBodyOpen)}>
+                    <div className="options-header">
                         <span>Draw Options</span>
+                        <div className="expander" onClick={(evt) => selectTab(isDrawBodyOpen, setIsDrawBodyOpen)}>v</div>
                     </div>
-                    <div className={'tab-body' + (isDrawBodyOpen ? ' active' : '')} ref={drawBody} style={{height: + drawBodyHeight + 'px'}}>
+                    <div className={'options-body' + (isDrawBodyOpen ? ' active' : '')} ref={drawBody} style={{height: + drawBodyHeight + 'px'}}>
                         <div className="checkbox-control">
                             <label>Draw On All</label>
                             <input type="checkbox" checked={props.bunch.drawOnAll} onChange={(evt) => toggleProperty(evt, "drawOnAll")} />
@@ -100,10 +136,11 @@ function BunchController(props) {
                     </div>
                 </div>
                 <div className="behavioral-options">
-                    <div className="tab-header" onClick={(evt) => selectTab(isBehavioralBodyOpen, setIsBehavioralBodyOpen)}>
+                    <div className="options-header">
                         <span>Behavioral Options</span>
+                        <div className="expander" onClick={(evt) => selectTab(isBehavioralBodyOpen, setIsBehavioralBodyOpen)}>v</div>
                     </div>
-                    <div className={'tab-body' + (isBehavioralBodyOpen ? ' active' : '')} ref={behavioralBody} style={{height: behavioralBodyHeight + 'px'}}>
+                    <div className={'options-body' + (isBehavioralBodyOpen ? ' active' : '')} ref={behavioralBody} style={{height: behavioralBodyHeight + 'px'}}>
                         <div className="slider-control">
                             <label>Base Acceleration</label>
                             <input type="range" min="0" max="75" className="slider" value={props.bunch.baseAcceleration} onChange={(evt) => setProperty(evt, "baseAcceleration")}/>
