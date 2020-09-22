@@ -31,6 +31,22 @@ canvas {
   background: #000;
 }
 
+.button {
+  background: rgba(150, 150, 150, 0.3);
+  color: #F0F0F0;
+  cursor: pointer;
+}
+
+#add-bunch {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  height: 30px;
+  width: 40px;
+  border-radius: 5px;
+  border: 1px solid #FFFFFF55;
+}
+
 #stats {
   position: relative;
 }
@@ -38,7 +54,7 @@ canvas {
 .controllers {
   position: absolute;
   right: 10px;
-  top: 10px;
+  top: 45px;
   width: 400px;
 }
 

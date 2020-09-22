@@ -44,30 +44,18 @@ function App() {
         let thisCtx = canvasEl.current.getContext('2d');
         // thisCtx.scale(scaleFactor, scaleFactor);
         
-        const bunch = new Bunch();
-        for (let i = 0; i < 50; i++) {
-            const accelerationScale = 10;
-            const position = new Vector2();
-            position.x = Math.random() * canvasEl.current.width;
-            position.y = Math.random() * canvasEl.current.height;
-            const acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
-            const velocity = acceleration.normalize().mult(15);
-            let boid = new Boid(position, velocity, acceleration);
-            bunch.addBoid(boid);
-        }
-        
-        const bunch2 = new Bunch();
-        bunch2.color = 'coral';
-        for (let i = 0; i < 50; i++) {
-            const accelerationScale = 10;
-            const position = new Vector2();
-            position.x = Math.random() * canvasEl.current.width;
-            position.y = Math.random() * canvasEl.current.height;
-            const acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
-            const velocity = acceleration.normalize().mult(15);
-            let boid = new Boid(position, velocity, acceleration);
-            bunch2.addBoid(boid);
-        }
+        // const bunch = new Bunch();
+        // for (let i = 0; i < 50; i++) {
+        //     const accelerationScale = 10;
+        //     const position = new Vector2();
+        //     position.x = Math.random() * canvasEl.current.width;
+        //     position.y = Math.random() * canvasEl.current.height;
+        //     const acceleration = new Vector2((Math.random() * 2 - 1) * accelerationScale, (Math.random() * 2 - 1) * accelerationScale);
+        //     const velocity = acceleration.normalize().mult(15);
+        //     let boid = new Boid(position, velocity, acceleration);
+        //     bunch.addBoid(boid);
+        // }
+        addBunch();
 
         // const obstacleObjects = [];
         // for (let i = 0; i < 25; i++) {
@@ -80,7 +68,7 @@ function App() {
         // setObstacles(obstacleObjects);
         obstacleManager.count = 25;
 
-        setBunches([bunch, bunch2]);
+        //setBunches([bunch]);
         setCtx(thisCtx);
     }, []);
 
@@ -104,6 +92,38 @@ function App() {
         bunches.forEach(bunch => bunch.lateDraw(ctx));
     });
 
+    const addBunch = () => {
+        const bunch = new Bunch();
+        let red = Math.random() * 255;
+        let green = Math.random() * 255;
+        let blue = Math.random() * 255;
+        const max = Math.max(red, green, blue);
+        red = red / max * 255;
+        green = green / max * 255;
+        blue = blue / max * 255;
+
+        bunch.color = `rgb(${red}, ${green}, ${blue})`;
+
+        const position = new Vector2();
+        position.x = Math.random() * canvasEl.current.width;
+        position.y = Math.random() * canvasEl.current.height;
+        const acceleration = new Vector2((Math.random() * 2 - 1) * bunch.baseAcceleration, (Math.random() * 2 - 1) * bunch.baseAcceleration);
+        const velocity = acceleration.normalize().mult(bunch.minSpeed);
+        let boid = new Boid(position, velocity, acceleration);
+        bunch.addBoid(boid);
+
+        bunches.push(bunch);
+    };
+
+    const deleteBunch = (bunch) => {
+        for (let i = 0; i < bunches.length; i++) {
+            if (bunches[i] == bunch) {
+                bunches.splice(i, 1);
+            }
+        }
+        // setBunches(bunches.filter(b => b != bunch));
+    };
+
     const showStats = false;
     const divStats = showStats ? (<div id="stats">
                                     <span>FPS:</span><span id="statFPS">{fps}</span><br/>
@@ -118,10 +138,11 @@ function App() {
     return (
         <div className="App">
             <canvas id="canvas" ref={canvasEl} width={dimensions.width} height={dimensions.height}></canvas>
+            <div id="add-bunch" className="button" onClick={addBunch}>Add</div>
             <div className="controllers">
                 <ObstacleController obstacleManager={obstacleManager}/>
                 {bunches.map((bunch, idx) => {
-                    return (<BunchController bunch={bunch} dimensions={dimensions} key={idx}/>)
+                    return (<BunchController bunch={bunch} dimensions={dimensions} key={idx} delete={deleteBunch}/>)
                 })}
                 {divStats}
             </div>

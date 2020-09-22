@@ -88,6 +88,7 @@ function BunchController(props) {
                 <div className="slider-control">
                     <input type="range" min="1" max="50" className="slider" value={props.bunch.count} onChange={(evt) => setProperty(evt, "count")}/>
                 </div>
+                <div className="button" onClick={(evt) => props.delete(props.bunch)}>d</div>
                 <div className="expander" onClick={(evt) => selectTab(isControllerBodyOpen, setIsControllerBodyOpen)}>v</div>
             </div>
             <div className="controller-body" ref={controllerBody} style={{height: controllerBodyHeight + 'px'}}>
