@@ -6,7 +6,7 @@ class Bunch {
         this.dimensions = { height: 0, width: 0 };
 
         this.boids = [];
-        this.color = 'red';
+        this.color = 'green';
         this.size = 4;
         this.baseAcceleration = 15;
         this.maxAcceleration = 20;
@@ -22,6 +22,7 @@ class Bunch {
         this.attractScale = 1;
         this.repelLikeScale = 1;
         this.repelOtherScale = 2;
+        this.repelObstacleScale = 3;
 
         this.direct = true;
         this.attract = true;
@@ -63,9 +64,9 @@ class Bunch {
         this.boids.push(boid);
     }
 
-    update = (deltaTime, ctx, bunches) => {
+    update = (deltaTime, ctx, bunches, obstacles) => {
         for(let i = 0; i < this.boids.length; i++) {
-            this.boids[i].update(deltaTime, ctx, bunches);
+            this.boids[i].update(deltaTime, ctx, bunches, obstacles);
         }    
     }
 

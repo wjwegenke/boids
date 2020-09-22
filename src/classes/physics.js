@@ -38,3 +38,19 @@ export function getSquareDistance(vector2A, vector2B) {
     var y = vector2A.y - vector2B.y;
     return x*x + y*y;
 }
+
+export function getComplimentPositions(position, ctx) {
+    let complimentX = position.x + ctx.canvas.width;
+    let complimentY = position.y + ctx.canvas.height;
+    if (position.y > ctx.canvas.height / 2) {
+        complimentY = position.y - ctx.canvas.height;
+    }
+    if (position.x > ctx.canvas.width / 2) {
+        complimentX = position.x - ctx.canvas.width;
+    }
+    return [
+        new Vector2(position.x, complimentY),
+        new Vector2(complimentX, position.y),
+        new Vector2(complimentX, complimentY)
+    ];
+}

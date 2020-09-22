@@ -156,6 +156,10 @@ function BunchController(props) {
                             <label>Repulsion Other Scale</label>
                             <input type="range" min="0" max="5" step="0.1" className="slider" value={props.bunch.repelOtherScale} onChange={(evt) => setProperty(evt, "repelOtherScale")}/>
                         </div>
+                        <div className="slider-control">
+                            <label>Repulsion Obstacle Scale</label>
+                            <input type="range" min="0" max="5" step="0.1" className="slider" value={props.bunch.repelObstacleScale} onChange={(evt) => setProperty(evt, "repelObstacleScale")}/>
+                        </div>
                     </div>
                 </div>
             </div>

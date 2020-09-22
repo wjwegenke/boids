@@ -5,6 +5,7 @@ import Bunch from './classes/bunch';
 import Boid from './classes/boid';
 import Vector2 from './classes/vector2';
 import BunchController from './components/bunchController';
+import Obstacle from './classes/obstacle';
 
 function App() {
     const canvasEl = useRef(null);
@@ -13,10 +14,12 @@ function App() {
         width: window.innerWidth
     });
     const [bunches, setBunches] = useState([]);
+    const [obstacles, setObstacles] = useState([]);
     bunches.forEach(bunch => bunch.dimensions = dimensions);
     const [ctx, setCtx] = useState(null);
     const [fps, setFps] = useState(0);
     const [dTime, setDTime] = useState(0);
+    const [dTimes, setDTimes] = useState([]);
     useEffect(() => {
         function handleResize() {
             setDimensions({
@@ -42,7 +45,7 @@ function App() {
         }
         
         const bunch2 = new Bunch();
-        bunch2.color = 'grey';
+        bunch2.color = 'coral';
         for (let i = 0; i < 100; i++) {
             const accelerationScale = 10;
             const position = new Vector2();
@@ -54,21 +57,41 @@ function App() {
             bunch2.addBoid(boid);
         }
 
+        const obstacleObjects = [];
+        for (let i = 0; i < 25; i++) {
+            const position = new Vector2();
+            position.x = Math.random() * canvasEl.current.width;
+            position.y = Math.random() * canvasEl.current.height;
+            const obstacle = new Obstacle(position);
+            obstacleObjects.push(obstacle);
+        }
+        setObstacles(obstacleObjects);
+
         setBunches([bunch, bunch2]);
         setCtx(thisCtx);
     }, []);
 
     useAnimationFrame(deltaTime => {
-        setDTime(Math.round(deltaTime));
-        setFps(Math.round(1000 / deltaTime));
-        bunches.forEach(bunch => bunch.update(deltaTime, ctx, bunches));
+        if (!ctx) return;
+        dTimes.push(deltaTime);
+        if (dTimes.length > 100) {
+            setDTimes(dTimes.slice(20));
+        }
+        const aveDeltaTime = dTimes.reduce((a, b) => a + b) / dTimes.length;
+        setDTime(Math.round(aveDeltaTime));
+        setFps(Math.round(1000 / aveDeltaTime));
+        bunches.forEach(bunch => {
+            bunch.update(deltaTime, ctx, bunches, obstacles)
+        });
+        obstacles.forEach(obstacle => obstacle.update(ctx));
         bunches.forEach(bunch => bunch.lateUpdate(deltaTime, ctx));
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
         bunches.forEach(bunch => bunch.draw(ctx));
+        obstacles.forEach(obstacle => obstacle.draw(ctx));
         bunches.forEach(bunch => bunch.lateDraw(ctx));
     });
 
-    const showStats = false;
+    const showStats = true;
     const divStats = showStats ? (<div id="stats">
                                     <span>FPS:</span><span id="statFPS">{fps}</span><br/>
                                     <span>Delta Time:</span><span id="statDeltaTime">{dTime}</span><br/>
