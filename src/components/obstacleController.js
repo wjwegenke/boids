@@ -1,5 +1,8 @@
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
+import ObstacleManager from '../classes/obstacleManager';
+import Obstacle from '../classes/obstacle';
+import Vector2 from '../classes/vector2';
 
 function ObstacleController(props) {
     const canvasEl = useRef(null);
@@ -40,18 +43,10 @@ function ObstacleController(props) {
 
     if (iconCtx) {
         iconCtx.clearRect(0, 0, iconCtx.canvas.width, iconCtx.canvas.height);
-        iconCtx.beginPath();
         //Base
-        iconCtx.fillStyle = props.obstacleManager.color;
-        iconCtx.arc(iconCtx.canvas.width/(2*ctxScale), iconCtx.canvas.height/(2*ctxScale), props.obstacleManager.size, 0, 2 * Math.PI, true);
-        iconCtx.fill();
-        
-        //Highlight
-        // iconCtx.lineWidth = 2;
-        // iconCtx.strokeStyle = props.obstacleManager.highlightColor;
-        // iconCtx.stroke();
-
-        iconCtx.closePath();
+        const obstacle = new Obstacle(new Vector2(iconCtx.canvas.width/(2*ctxScale), iconCtx.canvas.height/(2*ctxScale)));
+        obstacle.obstacleManager = props.obstacleManager;
+        obstacle.draw(iconCtx);
     }
 
     return (

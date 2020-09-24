@@ -19,7 +19,20 @@ class Obstacle {
         //Update self to canvas
         ctx.beginPath();
         ctx.fillStyle = this.obstacleManager.color;
-        ctx.arc(this.position.x, this.position.y, this.obstacleManager.size, 0, 2 * Math.PI, true);
+
+        //Setup triangle points
+        const A = new Vector2(0, -this.obstacleManager.size);
+        const B = new Vector2(A.x * Math.cos(120 / 180 * Math.PI) - (A.y * Math.sin(120 / 180 * Math.PI)), A.x * Math.sin(120 / 180 * Math.PI) + (A.y * Math.cos(120 / 180 * Math.PI)));
+        const C = new Vector2(A.x * Math.cos(240 / 180 * Math.PI) - (A.y * Math.sin(240 / 180 * Math.PI)), A.x * Math.sin(240 / 180 * Math.PI) + (A.y * Math.cos(240 / 180 * Math.PI)));
+        A.combine(this.position);
+        B.combine(this.position);
+        C.combine(this.position);
+
+        ctx.moveTo(A.x, A.y);
+        ctx.lineTo(B.x, B.y);
+        ctx.lineTo(C.x, C.y);
+        ctx.lineTo(A.x, A.y);
+        //ctx.arc(this.position.x, this.position.y, this.obstacleManager.size, 0, 2 * Math.PI, true);
         ctx.fill();
         if (this.isSelected) {
             ctx.lineWidth = 2;
